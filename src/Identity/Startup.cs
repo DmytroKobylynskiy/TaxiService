@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Identity.Data;
 using Identity.Models;
 using Identity.Services;
+using Microsoft.AspNetCore.Identity;
 
 namespace Identity
 {
@@ -46,7 +47,7 @@ namespace Identity
             services.AddApplicationInsightsTelemetry(Configuration);
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -92,6 +93,34 @@ namespace Identity
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+
+        public async Task DatabaseInitialize(IServiceProvider serviceProvider)
+        {
+            UserManager<ApplicationUser> userManager =
+                serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            RoleManager<IdentityRole> roleManager =
+                serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            string adminEmail = "admin@gmail.com";
+            string password = "_Aa123456";
+            if (await roleManager.FindByNameAsync("admin") == null)
+            {
+                await roleManager.CreateAsync(new IdentityRole("admin"));
+            }
+            if (await roleManager.FindByNameAsync("user") == null)
+            {
+                await roleManager.CreateAsync(new IdentityRole("user"));
+            }
+            if (await userManager.FindByNameAsync(adminEmail) == null)
+            {
+                ApplicationUser admin = new ApplicationUser {Email = adminEmail, UserName = adminEmail};
+                IdentityResult result = await userManager.CreateAsync(admin, password);
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(admin, "admin");
+                }
+            }
         }
     }
 }
