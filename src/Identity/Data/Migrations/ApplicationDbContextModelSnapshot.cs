@@ -83,6 +83,28 @@ namespace Identity.Data.Migrations
                     b.ToTable("TaxiOffers");
                 });
 
+            modelBuilder.Entity("Identity.Models.TaxiOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Date");
+
+                    b.Property<string>("EndPoint");
+
+                    b.Property<string>("PassengerName");
+
+                    b.Property<string>("PassengerPhone");
+
+                    b.Property<string>("StartPoint");
+
+                    b.Property<string>("Time");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TaxiOrders");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRole", b =>
                 {
                     b.Property<string>("Id");
