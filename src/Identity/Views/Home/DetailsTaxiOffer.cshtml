@@ -1,0 +1,17 @@
+﻿@model Identity.Models.TaxiOffer
+@{
+    ViewBag.Title = Model.Name;
+}
+<h2>Водитель @Model.Name</h2>
+<div>
+    <dl class="dl-horizontal">
+        <dt>Автомобиль</dt>
+        <dd>@Model.Auto</dd>
+        
+        <dt>Местоположение</dt>
+        <dd>@Model.Place</dd>
+
+        <dt>Цена</dt>
+        <dd>@Model.Price</dd>
+    </dl>
+</div>

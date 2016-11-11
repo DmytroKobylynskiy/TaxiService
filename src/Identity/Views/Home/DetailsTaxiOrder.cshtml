@@ -1,0 +1,32 @@
+﻿@model Identity.Models.TaxiOrder
+@{
+    ViewBag.Title = "Детали заказа";
+}
+<div>
+    <dl class="dl-horizontal">
+        <dt>Начальный пункт</dt>
+        <dd>@Model.StartPoint</dd>
+
+        <dt>Конечный пункт</dt>
+        <dd>@Model.EndPoint</dd>
+
+        <dt>Дата</dt>
+        <dd>@Model.Date</dd>
+
+        <dt>Время</dt>
+        <dd>@Model.Time</dd>
+        
+        <dt>Телефон</dt>
+        <dd>@Model.Date</dd>
+
+        <dt>Имя</dt>
+        <dd>@Model.PassengerName</dd>
+        
+        <dt>С животными</dt>
+        <div class="checkbox-disabled">
+            <label asp-for="WithAnimals"><input type="checkbox" value="@Model.WithAnimals" ></label>
+        </div>
+        
+            @Html.CheckBoxFor(x => x.FreightCar)
+</dl>
+</div>

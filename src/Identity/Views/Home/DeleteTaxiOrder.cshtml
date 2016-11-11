@@ -1,0 +1,35 @@
+﻿@model Identity.Models.TaxiOrder
+@{
+    ViewBag.Title = "Удаление заказа";
+}
+
+<div>
+    <dl class="dl-horizontal">
+        <dt>Начальный пункт</dt>
+        <dd>
+            @Html.DisplayFor(model => model.StartPoint)
+        </dd>
+
+        <dt>Конечный пункт</dt>
+        <dd>
+            @Html.DisplayFor(model => model.EndPoint)
+        </dd>
+        <dt>Дата</dt>
+        <dd>
+            @Html.DisplayFor(model => model.Date)
+        </dd>
+
+        <dt>Время</dt>
+        <dd>
+            @Html.DisplayFor(model => model.Time)
+        </dd>
+    </dl>
+
+    <div>
+        <form asp-controller="Home" asp-action="DeleteTaxiOrder" method="post">
+            <div class="form-group">
+                <input type="submit" class="btn btn-default" value="Удалить" />
+            </div>
+        </form>
+    </div>
+</div>

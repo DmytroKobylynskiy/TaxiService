@@ -8,9 +8,10 @@ using Identity.Data;
 namespace Identity.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20161107220941_InitialOrderUp")]
+    partial class InitialOrderUp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.0.0-rtm-21431")
@@ -92,8 +93,6 @@ namespace Identity.Data.Migrations
 
                     b.Property<string>("EndPoint");
 
-                    b.Property<bool>("FreightCar");
-
                     b.Property<string>("PassengerName");
 
                     b.Property<string>("PassengerPhone");
@@ -101,8 +100,6 @@ namespace Identity.Data.Migrations
                     b.Property<string>("StartPoint");
 
                     b.Property<string>("Time");
-
-                    b.Property<bool>("WithAnimals");
 
                     b.HasKey("Id");
 

@@ -8,9 +8,10 @@ using Identity.Data;
 namespace Identity.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20161107213233_InitialOrder")]
+    partial class InitialOrder
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.0.0-rtm-21431")
@@ -88,21 +89,11 @@ namespace Identity.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Date");
+                    b.Property<string>("Company");
 
-                    b.Property<string>("EndPoint");
+                    b.Property<string>("Name");
 
-                    b.Property<bool>("FreightCar");
-
-                    b.Property<string>("PassengerName");
-
-                    b.Property<string>("PassengerPhone");
-
-                    b.Property<string>("StartPoint");
-
-                    b.Property<string>("Time");
-
-                    b.Property<bool>("WithAnimals");
+                    b.Property<int>("Price");
 
                     b.HasKey("Id");
 

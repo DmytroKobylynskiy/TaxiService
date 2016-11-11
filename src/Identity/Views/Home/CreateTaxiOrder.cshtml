@@ -1,0 +1,39 @@
+﻿@model Identity.Models.TaxiOrder
+@{
+    ViewBag.Title = "Добавление нового предложения такси";
+}
+
+<form asp-action="CreateTaxiOrder" asp-controller="home">
+    <div class="form-group">
+        <label asp-for="StartPoint" class="control-label">Начальная точка</label>
+        <input type="text" asp-for="StartPoint" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="EndPoint" class="control-label">Конечный пункт</label>
+        <input type="text" asp-for="EndPoint" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Date" class="control-label">Дата</label>
+        <input type="text" asp-for="Date" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Time" class="control-label">Время</label>
+        <input type="number" asp-for="Time" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="PassengerName" class="control-label">Имя пасажира</label>
+        <input type="text" asp-for="PassengerName" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="PassengerPhone" class="control-label">Телефон</label>
+        <input type="number" asp-for="PassengerPhone" class="form-control" />
+    </div>
+    <dt>С животными</dt>
+    @Html.CheckBoxFor(m => m.WithAnimals)
+    <dt>Грузовая</dt>
+    @Html.CheckBoxFor(x => x.FreightCar)
+    
+    <div class="form-group">
+        <input type="submit" value="Send" class="btn btn-default" />
+    </div>
+</form>
