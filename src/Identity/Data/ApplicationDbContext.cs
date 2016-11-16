@@ -18,6 +18,7 @@ namespace Identity.Data
         }
         public DbSet<TaxiOffer> TaxiOffers { get; set; }
         public DbSet<TaxiOrder> TaxiOrders { get; set; }
+        public ApplicationDbContext db { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

@@ -74,6 +74,8 @@ namespace Identity.Data.Migrations
 
                     b.Property<string>("Name");
 
+                    b.Property<string>("OfferOwnerId");
+
                     b.Property<string>("Place");
 
                     b.Property<int>("Price");
@@ -93,6 +95,8 @@ namespace Identity.Data.Migrations
                     b.Property<string>("EndPoint");
 
                     b.Property<bool>("FreightCar");
+
+                    b.Property<string>("OrderOwnerId");
 
                     b.Property<string>("PassengerName");
 

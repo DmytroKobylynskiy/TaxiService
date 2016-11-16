@@ -16,5 +16,6 @@ namespace Identity.Models
         public bool FreightCar { get; set; }
         public string PassengerPhone { get; set; }
         public string PassengerName { get; set; }
+        public string OrderOwnerId { get; set; }
     }
 }

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Identity.Models;
 
-namespace CustomIdentityApp.Controllers
+namespace Identity.Controllers
 {
     public class RolesController : Controller
     {

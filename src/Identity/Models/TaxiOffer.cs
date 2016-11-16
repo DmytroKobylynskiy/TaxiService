@@ -12,5 +12,6 @@ namespace Identity.Models
         public string Auto { get; set; } // машина
         public string Place { get; set; } //расположение
         public int Price { get; set; } // цена
+        public string OfferOwnerId { get; set; }
     }
 }
