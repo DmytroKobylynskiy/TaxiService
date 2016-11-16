@@ -1,0 +1,18 @@
+﻿@model IEnumerable<Identity.Models.TaxiOffer>
+@{
+    ViewBag.Title = "Мои предложения";
+}
+
+<table class="table">
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Name - @item.Place</td>
+            <td>
+                <a asp-action="DetailsTaxiOrder" asp-controller="Home" asp-route-id="@item.Id">Подробнее</a> |
+                <a asp-action="EditTaxiOrder" asp-controller="Home" asp-route-id="@item.Id">Изменить</a> |
+                <a asp-action="DeleteTaxiOrder" asp-controller="Home" asp-route-id="@item.Id">Удалить</a>
+            </td>
+        </tr>
+    }
+</table>
