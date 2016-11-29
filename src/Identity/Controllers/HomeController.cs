@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Identity.Data;
 using Identity.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -44,13 +45,17 @@ namespace Identity.Controllers
             return RedirectToAction("TaxiOffers");
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         public async Task<IActionResult> TaxiOrders()
         {
-            return View(await db.TaxiOrders.ToListAsync());
+            List<TaxiOrder> taxiOrders = await db.TaxiOrders.ToListAsync();
+            for (int i = 0; i < taxiOrders.Count; i++)
+            {
+                if (taxiOrders[i].OrderStatus == "Done")
+                {
+                    taxiOrders.Remove(taxiOrders[i]);
+                }
+            }
+            return View(taxiOrders);
         }
 
         public async Task<IActionResult> MyOrders()
@@ -96,6 +101,7 @@ namespace Identity.Controllers
             var user = await GetCurrentUserAsync();
             var userId = user?.Id;
             taxiOrder.OrderOwnerId=userId;
+            taxiOrder.OrderStatus = "Free";
             db.TaxiOrders.Add(taxiOrder);
             await db.SaveChangesAsync();
             return RedirectToAction("TaxiOrders");
@@ -203,7 +209,7 @@ namespace Identity.Controllers
             }
             return NotFound();
         }
-
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> DeleteTaxiOffer(int? id)
         {
@@ -219,7 +225,7 @@ namespace Identity.Controllers
             }
             return NotFound();
         }
-
+        [Authorize(Roles = "admin")]
         [HttpPost]
         public async Task<IActionResult> DeleteTaxiOrder(int? id)
         {
@@ -229,6 +235,62 @@ namespace Identity.Controllers
                 if (taxiOrder != null)
                 {
                     db.TaxiOrders.Remove(taxiOrder);
+                    await db.SaveChangesAsync();
+                    return RedirectToAction("TaxiOrders");
+                }
+            }
+            return NotFound();
+        }
+
+        public async Task<IActionResult> AgreeTaxiOffer(int? id)
+        {
+            if (id != null)
+            {
+                TaxiOffer taxiOffer = await db.TaxiOffers.FirstOrDefaultAsync(p => p.Id == id);
+                if (taxiOffer != null)
+                {
+                    taxiOffer.OfferStatus = "In progress";
+                    db.TaxiOffers.Add(taxiOffer);
+                    await db.SaveChangesAsync();
+                    return View(taxiOffer);
+                }
+            }
+            return NotFound();
+        }
+
+        public async Task<IActionResult> AgreeTaxiOrder(int? id)
+        {
+            if (id != null)
+            {
+                TaxiOrder taxiOrder = await db.TaxiOrders.FirstOrDefaultAsync(p => p.Id == id);
+                if (taxiOrder != null)
+                {
+                    taxiOrder.OrderStatus = "In progress";
+                    db.TaxiOrders.Update(taxiOrder);
+                    await db.SaveChangesAsync();
+                    return View(taxiOrder);
+                }
+            }
+            return NotFound();
+        }
+        public async Task<IActionResult> ConfirmTaxiOrder(int? id)
+        {
+            TaxiOrder taxiOrder = await db.TaxiOrders.FirstOrDefaultAsync(p => p.Id == id);
+            return View(taxiOrder);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ConfirmTaxiOrder(int? id,TaxiOrder taxi)
+        {
+            if (id != null)
+            {
+                TaxiOrder taxiOrder = await db.TaxiOrders.FirstOrDefaultAsync(p => p.Id == id);
+                if (taxiOrder != null)
+                {
+                    taxiOrder.OrderStatus = "Done";
+                    taxiOrder.Distanse = taxi.Distanse;
+                    taxiOrder.Duration = taxi.Duration;
+                    db.TaxiOrders.Update(taxiOrder);
                     await db.SaveChangesAsync();
                     return RedirectToAction("TaxiOrders");
                 }

@@ -3,15 +3,20 @@
     ViewBag.Title = "Все заказы";
 }
 
+
 <table class="table">
     @foreach (var item in Model)
     {
         <tr>
             <td>@item.StartPoint - @item.EndPoint</td>
             <td>
-                <a asp-action="DetailsTaxiOrder" asp-controller="Home" asp-route-id="@item.Id">Подробнее</a> |
-                <a asp-action="EditTaxiOrder" asp-controller="Home" asp-route-id="@item.Id">Изменить</a> |
-                <a asp-action="DeleteTaxiOrder" asp-controller="Home" asp-route-id="@item.Id">Удалить</a>
+                <a asp-action="DetailsTaxiOrder" asp-controller="Home" asp-route-id="@item.Id">Подробнее</a> 
+                @if (this.User.IsInRole("admin"))
+                {
+                    <a asp-action="EditTaxiOrder" asp-controller="Home" asp-route-id="@item.Id">Изменить</a> 
+                    <a asp-action="DeleteTaxiOrder" asp-controller = "Home" asp-route-id = "@item.Id"> Удалить </a>
+                }
+                <a asp-action="AgreeTaxiOrder" asp-controller="Home" asp-route-id="@item.Id">Принять </a>
             </td>
         </tr>
     }

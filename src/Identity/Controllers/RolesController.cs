@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Identity.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Identity.Controllers
 {

@@ -13,5 +13,6 @@ namespace Identity.Models
         public string Place { get; set; } //расположение
         public int Price { get; set; } // цена
         public string OfferOwnerId { get; set; }
+        public string OfferStatus { get; set; }
     }
 }

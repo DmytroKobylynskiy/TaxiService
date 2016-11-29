@@ -9,9 +9,13 @@
         <tr>
             <td>@item.Name</td>
             <td>
-                <a asp-action="DetailsTaxiOffer" asp-controller="Home" asp-route-id="@item.Id">Подробнее</a> |
-                <a asp-action="EditTaxiOffer" asp-controller="Home" asp-route-id="@item.Id">Изменить</a> |
-                <a asp-action="DeleteTaxiOffer" asp-controller="Home" asp-route-id="@item.Id">Удалить</a>
+                <a asp-action="DetailsTaxiOffer" asp-controller="Home" asp-route-id="@item.Id">Подробнее</a> 
+                @if (this.User.IsInRole("admin"))
+                {
+                    <a asp-action="EditTaxiOffer" asp-controller="Home" asp-route-id="@item.Id">Изменить</a> 
+                    <a asp-action="DeleteTaxiOffer" asp-controller="Home" asp-route-id="@item.Id">Удалить</a>
+                }
+                <a asp-action="AgreeTaxiOffer" asp-controller="Home" asp-route-id="@item.Id">Принять </a>
             </td>
         </tr>
     }

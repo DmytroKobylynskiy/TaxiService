@@ -14,8 +14,11 @@ namespace Identity.Models
         public string Time { get; set; }
         public bool WithAnimals { get; set; }
         public bool FreightCar { get; set; }
+        public float Distanse { get; set; }
+        public float Duration { get; set; }
         public string PassengerPhone { get; set; }
         public string PassengerName { get; set; }
         public string OrderOwnerId { get; set; }
+        public string OrderStatus { get; set; }
     }
 }
