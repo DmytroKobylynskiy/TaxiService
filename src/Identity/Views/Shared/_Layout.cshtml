@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Identity</title>
+    <title>@ViewData["Title"] - TaxiSerice</title>
 
     <environment names="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
@@ -33,8 +33,8 @@
                 <ul class="nav navbar-nav">
                     <li><a asp-area="" asp-controller="Home" asp-action="Index">Главная</a></li>
                     <li><a asp-area="" asp-controller="Home" asp-action="About">О нас</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="TaxiOrders">Поиск такси</a></li>
-                    <li><a asp-area="" asp-controller="Home" asp-action="TaxiOffers">Поиск клиента</a></li>
+                    <li><a asp-area="" asp-controller="Order" asp-action="TaxiOrders">Поиск такси</a></li>
+                    <li><a asp-area="" asp-controller="Offer" asp-action="TaxiOffers">Предложение такси</a></li>
                 </ul>
                 @await Html.PartialAsync("_LoginPartial")
             </div>
@@ -44,7 +44,7 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; 2016 - Identity</p>
+            <p>&copy; 2016 - Taxi Service</p>
         </footer>
     </div>
 
