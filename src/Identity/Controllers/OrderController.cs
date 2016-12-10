@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Identity.Data;
 using Identity.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,14 +25,15 @@ namespace Identity.Controllers
         public async Task<IActionResult> TaxiOrders()
         {
             List<TaxiOrder> taxiOrders = await db.TaxiOrders.ToListAsync();
+            List<TaxiOrder> taxi = new List<TaxiOrder>();
             for (int i = 0; i < taxiOrders.Count; i++)
             {
-                if (taxiOrders[i].OrderStatus == "Done")
+                if (taxiOrders[i].OrderStatus!="Done")
                 {
-                    taxiOrders.Remove(taxiOrders[i]);
+                    taxi.Add(taxiOrders[i]);
                 }
             }
-            return View(taxiOrders);
+            return View(taxi);
         }
 
         public async Task<IActionResult> MyOrders()
@@ -102,7 +100,12 @@ namespace Identity.Controllers
             return RedirectToAction("TaxiOrders");
         }
 
-        [Authorize(Roles = "admin")]
+        
+        public async Task<IActionResult> DeleteTaxiOrder()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> DeleteTaxiOrder(int? id)
         {
@@ -143,9 +146,10 @@ namespace Identity.Controllers
                 TaxiOrder taxiOrder = await db.TaxiOrders.FirstOrDefaultAsync(p => p.Id == id);
                 if (taxiOrder != null)
                 {
-                    taxiOrder.OrderStatus = "Done";
+                    
                     taxiOrder.Distanse = taxi.Distanse;
                     taxiOrder.Duration = taxi.Duration;
+                    taxiOrder.OrderStatus = "Done";
                     db.TaxiOrders.Update(taxiOrder);
                     await db.SaveChangesAsync();
                     return RedirectToAction("TaxiOrders");

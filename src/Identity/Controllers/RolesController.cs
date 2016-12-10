@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Identity.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace Identity.Controllers
 {
@@ -14,10 +15,12 @@ namespace Identity.Controllers
     {
         RoleManager<IdentityRole> _roleManager;
         UserManager<ApplicationUser> _userManager;
-        public RolesController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+        private readonly ILogger _logger;
+        public RolesController(ILoggerFactory loggerFactory,RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
         {
             _roleManager = roleManager;
             _userManager = userManager;
+            _logger = loggerFactory.CreateLogger<RolesController>();
         }
         public IActionResult Index() => View(_roleManager.Roles.ToList());
 
@@ -58,6 +61,7 @@ namespace Identity.Controllers
 
         public async Task<IActionResult> Edit(string userId)
         {
+            _logger.LogInformation(userId);
             ApplicationUser user = await _userManager.FindByIdAsync(userId);
             if (user != null)
             {
@@ -95,5 +99,8 @@ namespace Identity.Controllers
 
             return NotFound();
         }
+        
+
+
     }
 }

@@ -1,4 +1,6 @@
-﻿@model IndexViewModel
+﻿@using System.Threading.Tasks
+@using Identity.Models.ManageViewModels
+@model Identity.Models.ManageViewModels.IndexViewModel
 @{
     ViewData["Title"] = "Manage your account";
 }
@@ -23,8 +25,16 @@
         </dd>
         <dt>External Logins:</dt>
         <dd>
-
-            @Model.Logins.Count <a asp-controller="Manage" asp-action="ManageLogins" class="btn-bracketed">Manage</a>
+            <a asp-controller="Manage" asp-action="ManageLogins" asp-route-userid="@Model" class="btn-bracketed">Manage</a>
+        </dd>
+        
+        <dt>Изменить роль :</dt>
+        <dd>
+            <a asp-controller="Manage" asp-action="ChangeRole" class="btn-bracketed">Изменить</a>
+        </dd>
+        
+        <dd>
+            <a asp-controller="Manage" asp-action="Requests" class="btn-bracketed">Заявки на изменение роли</a>
         </dd>
         <dt>Phone Number:</dt>
         <dd>

@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Identity.Data;
 using Identity.Models;
 using Identity.Models.ManageViewModels;
 using Identity.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Identity.Controllers
 {
@@ -17,6 +20,8 @@ namespace Identity.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        RoleManager<IdentityRole> _roleManager;
+        private ApplicationDbContext db;
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
@@ -26,8 +31,10 @@ namespace Identity.Controllers
         SignInManager<ApplicationUser> signInManager,
         IEmailSender emailSender,
         ISmsSender smsSender,
-        ILoggerFactory loggerFactory)
+        ILoggerFactory loggerFactory, RoleManager<IdentityRole> roleManager, ApplicationDbContext context)
         {
+            db = context;
+            _roleManager = roleManager;
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
@@ -35,8 +42,6 @@ namespace Identity.Controllers
             _logger = loggerFactory.CreateLogger<ManageController>();
         }
 
-        //
-        // GET: /Manage/Index
         [HttpGet]
         public async Task<IActionResult> Index(ManageMessageId? message = null)
         {
@@ -296,8 +301,6 @@ namespace Identity.Controllers
             });
         }
 
-        //
-        // POST: /Manage/LinkLogin
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult LinkLogin(string provider)
@@ -356,5 +359,129 @@ namespace Identity.Controllers
         }
 
         #endregion
+
+        //Change role by user
+        public async Task<IActionResult> ChangeRole()
+        {
+            var user = await GetCurrentUserAsync();
+            if (user != null)
+            {
+                var userRoles = await _userManager.GetRolesAsync(user);
+                var allRoles = _roleManager.Roles.ToList();
+                ChangeRoleViewModel model = new ChangeRoleViewModel
+                {
+                    UserId = user.Id,
+                    UserEmail = user.Email,
+                    UserRoles = userRoles,
+                    AllRoles = allRoles
+                };
+                return View(model);
+            }
+
+            return NotFound();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeRole(List<string> roles)
+        {
+            ApplicationUser user = await GetCurrentUserAsync();
+            if (user != null)
+            {
+                
+                var userRoles = await _userManager.GetRolesAsync(user);
+                if (userRoles.Contains("user"))
+                {
+                    var addedRoles = roles.Except(userRoles);
+                    var removedRoles = userRoles.Except(roles);
+                    RequestRole request = new RequestRole();
+                    request.NewRole = addedRoles.First();
+                    request.UserId = user.Id;
+                    request.RequestStatus = "In Progress";
+                    request.UserName = user.UserName;
+                    request.Id=db.RequestsRole.Count()+1;
+                    db.RequestsRole.Add(request);
+                    await db.SaveChangesAsync();
+                    return RedirectToAction("Index");
+                }
+                else {
+                    var allRoles = _roleManager.Roles.ToList();
+                    var addedRoles = roles.Except(userRoles);
+                    var removedRoles = userRoles.Except(roles);
+                    await _userManager.AddToRolesAsync(user, addedRoles);
+                    await _userManager.RemoveFromRolesAsync(user, removedRoles);
+                    return RedirectToAction("Index");
+                }
+                
+            }
+
+            return NotFound();
+        }
+
+        public async Task<IActionResult> ConfirmTaxiDriverRole(int id)
+        {
+
+            List<RequestRole> requests = await db.RequestsRole.ToListAsync();
+            _logger.LogInformation("wow"+id);
+            //_logger.LogInformation(requests[requestId-1].UserName);
+            ApplicationUser user = await _userManager.FindByIdAsync(requests[id-1].UserId);
+            if (user != null)
+            {
+                var userRoles = await _userManager.GetRolesAsync(user);
+                var allRoles = _roleManager.Roles.ToList();
+                ChangeRoleViewModel model = new ChangeRoleViewModel
+                {
+                    UserId = user.Id,
+                    UserEmail = user.Email,
+                    UserRoles = userRoles,
+                    AllRoles = allRoles
+                };
+                return View(model);
+            }
+
+            return NotFound();
+        }
+        [HttpPost]
+        public async Task<IActionResult> ConfirmTaxiDriverRole(string userId,List<string> roles,ChangeRoleViewModel changeRoleViewModel)
+        {
+            List<RequestRole> requests = await db.RequestsRole.ToListAsync();
+            _logger.LogInformation("wow2" + userId);
+            ApplicationUser user = await _userManager.FindByIdAsync(userId);
+            if (user != null)
+            {
+                var userRoles = await _userManager.GetRolesAsync(user);
+                user.CarExist = changeRoleViewModel.CarExist;
+                user.DriverLicense = changeRoleViewModel.DriverLicense;
+                db.Users.Update(user);
+                foreach(var request in requests)
+                {
+                    if (request.UserId == userId)
+                    {
+                        request.RequestStatus = "Done";
+                        db.RequestsRole.Update(request);
+                    }
+                }
+                
+                var addedRoles = roles.Except(userRoles);
+                var removedRoles = userRoles.Except(roles);
+                await _userManager.AddToRolesAsync(user, addedRoles);
+                await _userManager.RemoveFromRolesAsync(user, removedRoles);
+                db.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }
+
+            return NotFound();
+        }
+        public async Task<IActionResult> Requests()
+        {
+            List<RequestRole> requests = await db.RequestsRole.ToListAsync();
+            for (int i = 0; i < requests.Count; i++)
+            {
+                if (requests[i].RequestStatus == "Done")
+                {
+                    requests.Remove(requests[i]);
+                }
+            }
+            return View(requests);
+        }
     }
 }

@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Identity.Models
 {
@@ -7,6 +7,8 @@ namespace Identity.Models
     {
         public string UserId { get; set; }
         public string UserEmail { get; set; }
+        public bool CarExist { get; set; }
+        public string DriverLicense { get; set; }
         public List<IdentityRole> AllRoles { get; set; }
         public IList<string> UserRoles { get; set; }
         public ChangeRoleViewModel()

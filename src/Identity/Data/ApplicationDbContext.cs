@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Identity.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Identity.Models;
 
 namespace Identity.Data
 {
@@ -18,6 +13,7 @@ namespace Identity.Data
         }
         public DbSet<TaxiOffer> TaxiOffers { get; set; }
         public DbSet<TaxiOrder> TaxiOrders { get; set; }
+        public DbSet<RequestRole> RequestsRole { get; set; }
         public ApplicationDbContext db { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
