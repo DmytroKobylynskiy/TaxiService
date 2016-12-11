@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Identity.Data;
 
 namespace Identity.Data.Migrations
 {
@@ -14,6 +15,135 @@ namespace Identity.Data.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.0.0-rtm-21431")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("Identity.Models.ApplicationUser", b =>
+                {
+                    b.Property<string>("Id");
+
+                    b.Property<int>("AccessFailedCount");
+
+                    b.Property<bool>("CarExist");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken();
+
+                    b.Property<string>("DriverLicense");
+
+                    b.Property<string>("Email")
+                        .HasAnnotation("MaxLength", 256);
+
+                    b.Property<bool>("EmailConfirmed");
+
+                    b.Property<bool>("LockoutEnabled");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasAnnotation("MaxLength", 256);
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasAnnotation("MaxLength", 256);
+
+                    b.Property<string>("PasswordHash");
+
+                    b.Property<string>("PhoneNumber");
+
+                    b.Property<bool>("PhoneNumberConfirmed");
+
+                    b.Property<string>("SecurityStamp");
+
+                    b.Property<bool>("TwoFactorEnabled");
+
+                    b.Property<string>("UserName")
+                        .HasAnnotation("MaxLength", 256);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasName("UserNameIndex");
+
+                    b.ToTable("AspNetUsers");
+                });
+
+            modelBuilder.Entity("Identity.Models.RequestRole", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("NewRole");
+
+                    b.Property<string>("RequestStatus");
+
+                    b.Property<string>("UserId");
+
+                    b.Property<string>("UserName");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RequestsRole");
+                });
+
+            modelBuilder.Entity("Identity.Models.TaxiOffer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Auto");
+
+                    b.Property<string>("Name");
+
+                    b.Property<string>("OfferOwnerId");
+
+                    b.Property<string>("OfferStatus");
+
+                    b.Property<string>("Place");
+
+                    b.Property<int>("Price");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TaxiOffers");
+                });
+
+            modelBuilder.Entity("Identity.Models.TaxiOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Date");
+
+                    b.Property<float>("Distanse");
+
+                    b.Property<float>("Duration");
+
+                    b.Property<string>("EndPoint");
+
+                    b.Property<bool>("FreightCar");
+
+                    b.Property<string>("OrderOwnerId");
+
+                    b.Property<string>("OrderStatus");
+
+                    b.Property<string>("PassengerName");
+
+                    b.Property<string>("PassengerPhone");
+
+                    b.Property<string>("ReceiverId");
+
+                    b.Property<string>("StartPoint");
+
+                    b.Property<string>("Time");
+
+                    b.Property<bool>("WithAnimals");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TaxiOrders");
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRole", b =>
                 {
@@ -122,133 +252,6 @@ namespace Identity.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("TaxiService.Models.ApplicationUser", b =>
-                {
-                    b.Property<string>("Id");
-
-                    b.Property<int>("AccessFailedCount");
-
-                    b.Property<bool>("CarExist");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken();
-
-                    b.Property<string>("DriverLicense");
-
-                    b.Property<string>("Email")
-                        .HasAnnotation("MaxLength", 256);
-
-                    b.Property<bool>("EmailConfirmed");
-
-                    b.Property<bool>("LockoutEnabled");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasAnnotation("MaxLength", 256);
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasAnnotation("MaxLength", 256);
-
-                    b.Property<string>("PasswordHash");
-
-                    b.Property<string>("PhoneNumber");
-
-                    b.Property<bool>("PhoneNumberConfirmed");
-
-                    b.Property<string>("SecurityStamp");
-
-                    b.Property<bool>("TwoFactorEnabled");
-
-                    b.Property<string>("UserName")
-                        .HasAnnotation("MaxLength", 256);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasName("UserNameIndex");
-
-                    b.ToTable("AspNetUsers");
-                });
-
-            modelBuilder.Entity("TaxiService.Models.RequestRole", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("NewRole");
-
-                    b.Property<string>("RequestStatus");
-
-                    b.Property<string>("UserId");
-
-                    b.Property<string>("UserName");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("RequestsRole");
-                });
-
-            modelBuilder.Entity("TaxiService.Models.TaxiOffer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Auto");
-
-                    b.Property<string>("Name");
-
-                    b.Property<string>("OfferOwnerId");
-
-                    b.Property<string>("OfferStatus");
-
-                    b.Property<string>("Place");
-
-                    b.Property<int>("Price");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TaxiOffers");
-                });
-
-            modelBuilder.Entity("TaxiService.Models.TaxiOrder", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Date");
-
-                    b.Property<float>("Distanse");
-
-                    b.Property<float>("Duration");
-
-                    b.Property<string>("EndPoint");
-
-                    b.Property<bool>("FreightCar");
-
-                    b.Property<string>("OrderOwnerId");
-
-                    b.Property<string>("OrderStatus");
-
-                    b.Property<string>("PassengerName");
-
-                    b.Property<string>("PassengerPhone");
-
-                    b.Property<string>("StartPoint");
-
-                    b.Property<string>("Time");
-
-                    b.Property<bool>("WithAnimals");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TaxiOrders");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRole")
@@ -259,7 +262,7 @@ namespace Identity.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("TaxiService.Models.ApplicationUser")
+                    b.HasOne("Identity.Models.ApplicationUser")
                         .WithMany("Claims")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -267,7 +270,7 @@ namespace Identity.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("TaxiService.Models.ApplicationUser")
+                    b.HasOne("Identity.Models.ApplicationUser")
                         .WithMany("Logins")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -280,7 +283,7 @@ namespace Identity.Data.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("TaxiService.Models.ApplicationUser")
+                    b.HasOne("Identity.Models.ApplicationUser")
                         .WithMany("Roles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);

@@ -34,7 +34,7 @@
                 <div class="carousel-caption" role="option">
                     <p>
                         Предложение такси
-                        <a class="btn btn-default" href="file:///Z:/TaxiService-master/src/Identity/Views/Home/CreateTaxiOffer.cshtml">
+                        <a class="btn btn-default" asp-controller="Order" asp-action="TaxiOrders">
                             Создать
                         </a>
                     </p>
@@ -45,7 +45,7 @@
                 <div class="carousel-caption" role="option">
                     <p>
                         Поиск среди предложений такси
-                        <a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkID=525028&clcid=0x409">
+                        <a class="btn btn-default" asp-controller="Offer" asp-action="TaxiOffers">
                             Поиск
                         </a>
                     </p>
