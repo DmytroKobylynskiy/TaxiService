@@ -162,9 +162,10 @@ namespace Identity.Controllers
             var userId = user?.Id;
             var taxiDriver = await userManager.FindByIdAsync(receiverId);
             _logger.LogInformation(Order.Date + " " + Order.Time);
-            _logger.LogInformation(user.IsAvaliable);
+            _logger.LogInformation(taxiDriver.IsAvaliable);
             String curDateTime = Order.Date+" "+Order.Time;
-            if (DateTime.Parse(taxiDriver.IsAvaliable) < DateTime.Parse(curDateTime))
+
+            if (taxiDriver.IsAvaliable == null || DateTime.Parse(taxiDriver.IsAvaliable) < DateTime.Parse(curDateTime))
             {
                 Order.OrderOwnerId = userId;
                 Order.OrderStatus = "Cвободен";
@@ -270,7 +271,11 @@ namespace Identity.Controllers
                     Order.ExpectedTime = expectedTime;
                     Order.ExpectedDate = expectedDate;
                     db.Orders.Update(Order);
-                    if ((TimeSpan.Parse(Orders[i].Time) < TimeSpan.Parse(Order.ExpectedTime))&& (TimeSpan.Parse(Orders[i].Date) < TimeSpan.Parse(Order.ExpectedDate)))
+                    String curDateTime = Orders[i].Date + " " + Orders[i].Time;
+                    _logger.LogInformation("CurD" + curDateTime);
+                    String expectedDateTime = expectedDate + " " + expectedTime;
+                    _logger.LogInformation("ExpD" + expectedDateTime);
+                    if (DateTime.Parse(curDateTime)<DateTime.Parse(expectedDateTime))
                     {
                         //AutoRejectOrder(i);
                         Orders[i].ReceiverId = null;
