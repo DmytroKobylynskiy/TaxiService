@@ -1,0 +1,15 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+</head>
+<body>
+    <div>
+        <h2>Водитель доступен с @ViewData["Avaliable"], ваш заказ не был сформирован</h2>
+        <span>Вернуться к созданию заказа?</span>
+    </div>
+    <a class="btn btn-default" asp-action="CreateTaxiOrderToConcreateDriver" asp-controller="Order" 
+   asp-route-receiverId="@ViewData["Receiver"]">Создать </a>
+</body>
+</html>

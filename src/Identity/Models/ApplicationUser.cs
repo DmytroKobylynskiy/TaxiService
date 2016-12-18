@@ -11,5 +11,7 @@ namespace Identity.Models
         [Required]
         [StringLength(10)]
         public string DriverLicense { get; set; }
+
+        public string IsAvaliable { get; set; }
     }
 }

@@ -1,0 +1,55 @@
+﻿@using Identity.Models
+@model IEnumerable<Identity.Models.Order>
+@{
+    ViewBag.Title = "Все запроси";
+}
+<script>
+        $(function () {
+            $('#btnLaunch').click(function () {
+                $('#myModal').modal('show');
+            });
+
+            $('#btnSave').click(function () {
+                var value = $('#txtInput').val();
+                $('#myModal').modal('hide');
+                setText(value, "expectedTime");
+            });
+        });
+        function setText(val, e) {
+            document.getElementByAttribute(e).value = val;
+        }
+</script>
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+    
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.StartPoint </td>
+            <td>@item.EndPoint </td>
+            <td>
+                <div class="btn-group">
+                    <a class="btn btn-default" data-toggle="tooltip" title="Подробнее" data-placement="top" asp-action="DetailsTaxiOrder" asp-controller="Order" asp-route-id="@item.Id"><span class="glyphicon glyphicon-info-sign"></span></a>
+                    @if (this.User.IsInRole("admin"))
+                    {
+                        <a class="btn btn-default" data-toggle="tooltip" title="Изменить" data-placement="top" asp-action="EditTaxiOrder" asp-controller="Order" asp-route-id="@item.Id"><span class="glyphicon glyphicon-pencil"></span></a>
+                        <a class="btn btn-default" data-toggle="tooltip" title="Удалить" data-placement="top" asp-action="DeleteTaxiOrder" asp-controller="Order" asp-route-id="@item.Id"><span class="glyphicon glyphicon-remove"></span> </a>
+                        if (item.OrderStatus != "Выполнен")
+                        {
+                            <a class="btn btn-default" asp-action="AgreeTaxiOrder" data-toggle="tooltip" title="Принять" data-placement="top" asp-controller="Order" asp-route-id="@item.Id"><span class="glyphicon glyphicon-ok"></span></a>
+                        }
+                    }
+                    else if (this.User.IsInRole("taxi driver"))
+                    {
+                        if (item.OrderStatus != "Выполнен")
+                        {
+                            <a class="btn btn-default" asp-action="RejectOrder" data-toggle="tooltip" title="Отменить" data-placement="top" asp-controller="Order" asp-route-id="@item.Id"><span class="glyphicon glyphicon-ban-circle"></span></a>
+                            <a class="btn btn-default" asp-action="AgreeTaxiOrder" data-toggle="tooltip" title="Принять" data-placement="top" asp-controller="Order" asp-route-id="@item.Id" asp-route-id="@item.Id"><span class="glyphicon glyphicon-ok"></span></a>
+                        }
+                    }
+                </div>
+            </td>
+        </tr>
+    }
+</table>

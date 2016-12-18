@@ -471,6 +471,8 @@ namespace Identity.Controllers
 
             return NotFound();
         }
+
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Requests()
         {
             List<RequestRole> requests = await db.RequestsRole.ToListAsync();

@@ -1,27 +1,87 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Identity.Data;
 using Identity.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Identity.Controllers
 {
+    [Authorize]
     public class OfferController : Controller
     {
         private ApplicationDbContext db;
+        private readonly ILogger _logger;
         private UserManager<ApplicationUser> userManager;
 
         private Task<ApplicationUser> GetCurrentUserAsync() => userManager.GetUserAsync(HttpContext.User);
-        public OfferController(ApplicationDbContext context, UserManager<ApplicationUser> _userManager)
+        public OfferController(ILoggerFactory loggerFactory,ApplicationDbContext context, UserManager<ApplicationUser> _userManager)
         {
             db = context;
             userManager = _userManager;
+            _logger = loggerFactory.CreateLogger<ManageController>();
         }
-        public async Task<IActionResult> TaxiOffers()
+
+        public List<TaxiOffer> GetTaxiOffers()
         {
-            return View(await db.TaxiOffers.ToListAsync());
+            List<TaxiOffer> taxiOffers = db.TaxiOffers.ToList();
+            List<TaxiOffer> taxi = new List<TaxiOffer>();
+            for (int i = 0; i < taxiOffers.Count(); i++)
+            {
+                if (taxiOffers[i].OfferStatus == "Свободен")
+                {
+                    taxi.Add(taxiOffers[i]);
+                }
+            }
+            return taxi;
+        }
+        public JsonResult GetData()
+        {
+            // создадим список данных
+            List<TaxiOffer> taxi = GetTaxiOffers();
+            return Json(taxi);
+        }
+
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> TaxiOffers(string searchString, SortState.SortingState sortOrder = SortState.SortingState.StartPointAsc)
+        {
+            var taxiOffers = await db.TaxiOffers.ToListAsync();
+            List<TaxiOffer> taxi = new List<TaxiOffer>();
+
+            for (int i = 0; i < taxiOffers.Count(); i++)
+            {
+                if (taxiOffers[i].OfferStatus == "Свободен")
+                {
+                    taxi.Add(taxiOffers[i]);
+                }
+            }
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                taxi = taxi.Where(s => s.Name.Contains(searchString)).ToList();
+            }
+            ViewData["PriceSort"] = sortOrder == SortState.SortingState.PriceAsc ? SortState.SortingState.PriceDesc : SortState.SortingState.PriceAsc;
+
+            switch (sortOrder)
+            {
+                case SortState.SortingState.PriceDesc:
+                    taxi = taxi.OrderByDescending(s => s.Price).ToList();
+                    break;
+                default:
+                    taxi = taxi.OrderBy(s => s.Price).ToList();
+                    break;
+            }
+
+            return View(taxi);
         }
         public IActionResult CreateTaxiOffer()
         {
@@ -30,9 +90,12 @@ namespace Identity.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateTaxiOffer(TaxiOffer taxiOffer)
         {
+            
             var user = await GetCurrentUserAsync();
             var userId = user?.Id;
+            db.Users.Update(user);
             taxiOffer.OfferOwnerId = userId;
+            taxiOffer.OfferStatus = "Свободен";
             db.TaxiOffers.Add(taxiOffer);
             await db.SaveChangesAsync();
             return RedirectToAction("TaxiOffers");
@@ -119,11 +182,20 @@ namespace Identity.Controllers
             if (id != null)
             {
                 TaxiOffer taxiOffer = await db.TaxiOffers.FirstOrDefaultAsync(p => p.Id == id);
-                if (taxiOffer != null)
+                ApplicationUser user = await userManager.FindByIdAsync(taxiOffer.OfferOwnerId);
+                String curDateTime =  DateTime.Now.ToString("yyyy-MM-dd") +" "+ DateTime.Now.ToString("HH:mm",
+                                         System.Globalization.DateTimeFormatInfo.InvariantInfo);
+                _logger.LogInformation(curDateTime);
+                if (user.IsAvaliable==null||DateTime.Parse(user.IsAvaliable) < DateTime.Parse(curDateTime))
                 {
-                    taxiOffer.OfferStatus = "In progress";
+                    //taxiOffer.OfferStatus = "Выполняется";
                     db.TaxiOffers.Update(taxiOffer);
                     await db.SaveChangesAsync();
+                    return View(taxiOffer);
+                }
+                else
+                {
+                    ViewData["Avaliable"] = user.IsAvaliable;
                     return View(taxiOffer);
                 }
             }

@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Identity.Data;
 using Identity.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Identity.Controllers
 {
+    [Authorize]
     public class OrderController : Controller
     {
 
@@ -33,53 +36,29 @@ namespace Identity.Controllers
             return View();
         }
 
-        public JsonResult GetData()
+        public IActionResult Error(string receiverId)
         {
-            // создадим список данных
-            List<Station> stations = new List<Station>();
-            stations.Add(new Station()
-            {
-                Id = 1,
-                PlaceName = "Библиотека имени Ленина",
-                GeoLat = 37.610489,
-                GeoLong = 55.752308,
-                Line = "Сокольническая",
-                Traffic = 1.0
-            });
-            stations.Add(new Station()
-            {
-                Id = 2,
-                PlaceName = "Александровский сад",
-                GeoLat = 37.608644,
-                GeoLong = 55.75226,
-                Line = "Арбатско-Покровская",
-                Traffic = 1.2
-            });
-            stations.Add(new Station()
-            {
-                Id = 3,
-                PlaceName = "Боровицкая",
-                GeoLat = 37.609073,
-                GeoLong = 55.750509,
-                Line = "Серпуховско-Тимирязевская",
-                Traffic = 1.0
-            });
-
-            return Json(stations);
+            ViewData["Receiver"] = receiverId;
+            return View();
         }
 
-        public async Task<IActionResult> TaxiOrders(SortState.SortingState sortOrder = SortState.SortingState.StartPointAsc)
+        public async Task<IActionResult> TaxiOrders(string searchString,SortState.SortingState sortOrder = SortState.SortingState.StartPointAsc)
         {
-            IQueryable<TaxiOrder> taxiOrders = db.TaxiOrders.AsNoTracking();
-            List<TaxiOrder> taxi = new List<TaxiOrder>();
+            var taxiOrders = await db.Orders.ToListAsync();
+            List<Order> taxi = new List<Order>();
+           
             for (int i = 0; i < taxiOrders.Count(); i++)
             {
-                if ((string)taxiOrders.Skip(i).First().OrderStatus != "Done" && (string)taxiOrders.Skip(i).First().ReceiverId == null)
+                if (taxiOrders[i].OrderStatus != "Выполнен" && taxiOrders[i].ReceiverId==null && taxiOrders[i].OrderStatus != "Выполняется")
                 {
-                    taxi.Add(taxiOrders.Skip(i).First());
+                    taxi.Add(taxiOrders[i]);
                 }
             }
-
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                taxi = taxi.Where(s => s.StartPoint.Contains(searchString)).ToList();
+            }
+            taxi.OrderByDescending(s => s.StartPoint).ToList();
             ViewData["StartPointSort"] = sortOrder == SortState.SortingState.StartPointAsc ? SortState.SortingState.StartPointDesc : SortState.SortingState.StartPointAsc;
             ViewData["EndPointSort"] = sortOrder == SortState.SortingState.EndPointAsc ? SortState.SortingState.EndPointDesc : SortState.SortingState.EndPointAsc;
             ViewData["DateSort"] = sortOrder == SortState.SortingState.DateAsc ? SortState.SortingState.DateDesc : SortState.SortingState.DateAsc;
@@ -97,10 +76,10 @@ namespace Identity.Controllers
                     taxi = taxi.OrderByDescending(s => s.EndPoint).ToList();
                     break;
                 case SortState.SortingState.DateAsc:
-                    taxi = taxi.OrderBy(s => s.Date).ToList();
+                    taxi = taxi.OrderBy(s => s.Time).ToList();
                     break;
                 case SortState.SortingState.DateDesc:
-                    taxi = taxi.OrderByDescending(s => s.Date).ToList();
+                    taxi = taxi.OrderByDescending(s => s.Time).ToList();
                     break;
                 case SortState.SortingState.StatusOrderAsc:
                     taxi = taxi.OrderBy(s => s.OrderStatus).ToList();
@@ -112,18 +91,18 @@ namespace Identity.Controllers
                     taxi = taxi.OrderBy(s => s.StartPoint).ToList();
                     break;
             }
-            return View(taxi);
+            return View(taxi.ToList());
         }
 
         public async Task<IActionResult> MyOrders()
         {
             var user = await GetCurrentUserAsync();
             var userId = user?.Id;
-            List<TaxiOrder> allOrders = await db.TaxiOrders.ToListAsync();
-            List<TaxiOrder> myOrders = new List<TaxiOrder>();
+            List<Order> allOrders = await db.Orders.ToListAsync();
+            List<Order> myOrders = new List<Order>();
             foreach (var order in allOrders)
             {
-                if (order.OrderOwnerId == userId)
+                if (order.OrderOwnerId == userId&& order.OrderStatus != "Выполнен")
                 {
                     myOrders.Add(order);
                 }
@@ -135,8 +114,8 @@ namespace Identity.Controllers
         {
             var user = await GetCurrentUserAsync();
             var userId = user.Id;
-            List<TaxiOrder> allOrders = await db.TaxiOrders.ToListAsync();
-            List<TaxiOrder> myRequest = new List<TaxiOrder>();
+            List<Order> allOrders = await db.Orders.ToListAsync();
+            List<Order> myRequest = new List<Order>();
             foreach (var order in allOrders)
             {
                 if (order.ReceiverId == userId)
@@ -152,48 +131,61 @@ namespace Identity.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> CreateTaxiOrder(TaxiOrder taxiOrder)
+        public async Task<IActionResult> CreateTaxiOrder(Order Order)
         {
-
+      
             var user = await GetCurrentUserAsync();
             var userId = user?.Id;
-            taxiOrder.OrderOwnerId = userId;
-            taxiOrder.OrderStatus = "Free";
-            db.TaxiOrders.Add(taxiOrder);
+            Order.OrderOwnerId = userId;
+            Order.OrderStatus = "Свободен";
+            db.Orders.Add(Order);
             await db.SaveChangesAsync();
             return RedirectToAction("TaxiOrders");
         }
 
         public async Task<IActionResult> CreateTaxiOrderToConcreateDriver(string receiverId)
         {
-            TaxiOrder taxiOrder = new TaxiOrder();
-            taxiOrder.ReceiverId = receiverId;
+            Order Order = new Order();
+            Order.ReceiverId = receiverId;
+            var taxiDriver = await userManager.FindByIdAsync(receiverId);
+            ViewData["Avaliable"] = taxiDriver.IsAvaliable;
             _logger.LogInformation("ReceiverId"+receiverId);
-            //db.TaxiOrders.Add(taxiOrder);
-           // await db.SaveChangesAsync();
-            return View(taxiOrder);
+            //db.Orders.Add(Order);
+            //await db.SaveChangesAsync();
+            return View(Order);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTaxiOrderToConcreateDriver(string receiverId,TaxiOrder taxiOrder)
+        public async Task<IActionResult> CreateTaxiOrderToConcreateDriver(string receiverId,Order Order)
         {
-
             var user = await GetCurrentUserAsync();
             var userId = user?.Id;
-            taxiOrder.OrderOwnerId = userId;
-            taxiOrder.OrderStatus = "In Progress";
-            db.TaxiOrders.Add(taxiOrder);
-            await db.SaveChangesAsync();
-            return RedirectToAction("TaxiOrders");
+            var taxiDriver = await userManager.FindByIdAsync(receiverId);
+            _logger.LogInformation(Order.Date + " " + Order.Time);
+            _logger.LogInformation(user.IsAvaliable);
+            String curDateTime = Order.Date+" "+Order.Time;
+            if (DateTime.Parse(taxiDriver.IsAvaliable) < DateTime.Parse(curDateTime))
+            {
+                Order.OrderOwnerId = userId;
+                Order.OrderStatus = "Cвободен";
+                db.Orders.Add(Order);
+                await db.SaveChangesAsync();
+                return RedirectToAction("TaxiOrders");
+            }
+            else
+            {
+                return NotFound("Водитель доступен с "+ taxiDriver.IsAvaliable);
+            }
+
         }
 
         public async Task<IActionResult> DetailsTaxiOrder(int? id)
         {
             if (id != null)
             {
-                TaxiOrder taxiOrder = await db.TaxiOrders.FirstOrDefaultAsync(p => p.Id == id);
-                if (taxiOrder != null)
-                    return View(taxiOrder);
+                Order Order = await db.Orders.FirstOrDefaultAsync(p => p.Id == id);
+                if (Order != null)
+                    return View(Order);
             }
             return NotFound();
         }
@@ -202,17 +194,21 @@ namespace Identity.Controllers
         {
             if (id != null)
             {
-                TaxiOrder taxiOrder = await db.TaxiOrders.FirstOrDefaultAsync(p => p.Id == id);
-                if (taxiOrder != null)
-                    return View(taxiOrder);
+                Order Order = await db.Orders.FirstOrDefaultAsync(p => p.Id == id);
+                if (Order != null)
+                    return View(Order);
             }
             return NotFound();
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditTaxiOrder(TaxiOrder taxiOrder)
+        public async Task<IActionResult> EditTaxiOrder(Order Order)
         {
-            db.TaxiOrders.Update(taxiOrder);
+            var user = await GetCurrentUserAsync();
+            var userId = user?.Id;
+            Order.OrderOwnerId = userId;
+            Order.OrderStatus = "Свободен";
+            db.Orders.Update(Order);
             await db.SaveChangesAsync();
             return RedirectToAction("TaxiOrders");
         }
@@ -222,9 +218,9 @@ namespace Identity.Controllers
         {
             if (id != null)
             {
-                TaxiOrder taxiOrder = await db.TaxiOrders.FirstOrDefaultAsync(p => p.Id == id);
-                if (taxiOrder != null)
-                    return View(taxiOrder);
+                Order Order = await db.Orders.FirstOrDefaultAsync(p => p.Id == id);
+                if (Order != null)
+                    return View(Order);
             }
             return NotFound();
         }
@@ -234,10 +230,10 @@ namespace Identity.Controllers
         {
             if (id != null)
             {
-                TaxiOrder taxiOrder = await db.TaxiOrders.FirstOrDefaultAsync(p => p.Id == id);
-                if (taxiOrder != null)
+                Order Order = await db.Orders.FirstOrDefaultAsync(p => p.Id == id);
+                if (Order != null)
                 {
-                    db.TaxiOrders.Remove(taxiOrder);
+                    db.Orders.Remove(Order);
                     await db.SaveChangesAsync();
                     return RedirectToAction("TaxiOrders");
                 }
@@ -245,35 +241,99 @@ namespace Identity.Controllers
             return NotFound();
         }
 
-        public async Task<IActionResult> AgreeTaxiOrder(int? id)
+
+        
+        public async Task<IActionResult> AgreeTaxiOrder(int id, string expectedTime)
         {
             if (id != null)
             {
-                TaxiOrder taxiOrder = await db.TaxiOrders.FirstOrDefaultAsync(p => p.Id == id);
-                if (taxiOrder != null)
+                Order Order = await db.Orders.FirstOrDefaultAsync(p => p.Id == id);
+                if (Order != null)
                 {
-                    taxiOrder.OrderStatus = "In progress";
-                    db.TaxiOrders.Update(taxiOrder);
-                    await db.SaveChangesAsync();
-                    return View(taxiOrder);
+                    return View(Order);
                 }
             }
             return NotFound();
         }
 
         [HttpPost]
-        public async Task<IActionResult> ConfirmTaxiOrder(int? id, TaxiOrder taxi)
+        public async Task<IActionResult> AgreeTaxiOrder(int? id,string expectedTime,string expectedDate)
         {
             if (id != null)
             {
-                TaxiOrder taxiOrder = await db.TaxiOrders.FirstOrDefaultAsync(p => p.Id == id);
-                if (taxiOrder != null)
+                Order Order = await db.Orders.FirstOrDefaultAsync(p => p.Id == id);
+                
+                List<Order> Orders = await db.Orders.ToListAsync();
+                for (int i = 0; i < Orders.Count(); i++)
                 {
+                    _logger.LogInformation(expectedTime);
+                    Order.ExpectedTime = expectedTime;
+                    Order.ExpectedDate = expectedDate;
+                    db.Orders.Update(Order);
+                    if ((TimeSpan.Parse(Orders[i].Time) < TimeSpan.Parse(Order.ExpectedTime))&& (TimeSpan.Parse(Orders[i].Date) < TimeSpan.Parse(Order.ExpectedDate)))
+                    {
+                        //AutoRejectOrder(i);
+                        Orders[i].ReceiverId = null;
+                        db.Orders.Update(Orders[i]);
+                    }
+                }
+
+                if (Order != null)
+                {
+                    var user = await GetCurrentUserAsync();
+                    var userId = user?.Id;
+                    Order.OrderStatus = "Выполняется";
+                    Order.ReceiverId = userId;
+                    user.IsAvaliable = expectedDate + " " + expectedTime;
+                    db.Users.Update(user);
+                    db.Orders.Update(Order);
+                    await db.SaveChangesAsync();
                     
-                    taxiOrder.Distanse = taxi.Distanse;
-                    taxiOrder.Duration = taxi.Duration;
-                    taxiOrder.OrderStatus = "Done";
-                    db.TaxiOrders.Update(taxiOrder);
+                    return View(Order);
+                }
+            }
+            return NotFound();
+        }
+
+        public async void AutoRejectOrder(int id)
+        {
+            List<Order> allOrders = await db.Orders.ToListAsync();
+            allOrders[id].ReceiverId = null;
+            db.Orders.Update(allOrders[id]);
+            await db.SaveChangesAsync();
+        }
+
+        public async Task<IActionResult> AgreeTaxiOffer(int? id)
+        {
+            if (id != null)
+            {
+                TaxiOffer taxiOffer = await db.TaxiOffers.FirstOrDefaultAsync(p => p.Id == id);
+                if (taxiOffer != null)
+                {
+                    //taxiOffer.OfferStatus = "Выполняется";
+                    db.TaxiOffers.Update(taxiOffer);
+                    await db.SaveChangesAsync();
+                    return View(taxiOffer);
+                }
+            }
+            return NotFound();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ConfirmTaxiOrder(int? id, Order taxi)
+        {
+            if (id != null)
+            {
+                ApplicationUser user = await GetCurrentUserAsync();
+                Order Order = await db.Orders.FirstOrDefaultAsync(p => p.Id == id);
+                if (Order != null)
+                {
+                    Order.OrderStatus = "Выполнен";
+                    Order.Distanse = taxi.Distanse;
+                    Order.Duration = taxi.Duration;
+                    _logger.LogInformation(Order.OrderStatus);
+                    user.IsAvaliable = null;
+                    db.Orders.Update(Order);
                     await db.SaveChangesAsync();
                     return RedirectToAction("TaxiOrders");
                 }
@@ -283,8 +343,8 @@ namespace Identity.Controllers
 
         public async Task<IActionResult> ConfirmTaxiOrder(int? id)
         {
-            TaxiOrder taxiOrder = await db.TaxiOrders.FirstOrDefaultAsync(p => p.Id == id);
-            return View(taxiOrder);
+            Order Order = await db.Orders.FirstOrDefaultAsync(p => p.Id == id);
+            return View(Order);
         }
 
         [HttpGet]
@@ -293,11 +353,37 @@ namespace Identity.Controllers
         {
             if (id != null)
             {
-                TaxiOrder taxiOrder = await db.TaxiOrders.FirstOrDefaultAsync(p => p.Id == id);
-                if (taxiOrder != null)
-                    return View(taxiOrder);
+                Order Order = await db.Orders.FirstOrDefaultAsync(p => p.Id == id);
+                if (Order != null)
+                    return View(Order);
             }
             return NotFound();
+        }
+
+
+        public async Task<IActionResult> RejectOrder(int? id)
+        {
+            var user = await GetCurrentUserAsync();
+            var userId = user.Id;
+            List<Order> allOrders = await db.Orders.ToListAsync();
+            foreach (var order in allOrders)
+            {
+                if (order.ReceiverId == userId&&order.Id==id&&order.OrderStatus!="Выполнен")
+                {
+                    order.ReceiverId = null;
+                    db.Orders.Update(order);
+                    await db.SaveChangesAsync();
+                }
+            }
+
+
+            return RedirectToAction("MyRequests");
+        }
+
+        public async Task<IActionResult> Layout()
+        {
+            
+            return View();
         }
     }
 }

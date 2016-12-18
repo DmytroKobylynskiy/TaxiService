@@ -1,0 +1,81 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<script src="http://maps.google.com/maps/api/js?sensor=true" type="text/javascript"></script>
+
+<style>
+    .stationInfo {
+        height: 150px;
+        width: 250px;
+    }
+</style>
+
+<div id="canvas" style="height: 600px; width:600px;"></div>
+
+<!--Устанавливаем секцию scripts, которая затем будет рендериться на мастер-странице -->
+@section scripts {
+    <script type="text/javascript">
+
+    $(document).ready(function () {
+        GetMap();
+    });
+
+    // Функция загрузки
+    function GetMap() {
+
+        google.maps.visualRefresh = true;
+        // установка основных координат
+        var Moscow = new google.maps.LatLng(50.443124, 30.517025);
+
+        // Установка общих параметров отображения карты, как масштаб, центральная точка и тип карты
+        var mapOptions = {
+            zoom: 15,
+            center: Moscow,
+            mapTypeId: google.maps.MapTypeId.G_NORMAL_MAP
+        };
+
+        // Встраиваем гугл-карты в элемент на странице и получаем объект карты
+        var map = new google.maps.Map(document.getElementById("canvas"), mapOptions);
+
+        // Настраиваем красный маркер, который будет использоваться для центральной точки
+        var myLatlng = new google.maps.LatLng(50.443124, 30.517025);
+
+        var marker = new google.maps.Marker({
+            position: myLatlng,
+            map: map,
+            title: 'Предложения'
+        });
+
+        // Берем для маркера иконку с сайта google
+        marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png')
+
+        // Получаем данные
+        $.getJSON('@Url.Action("GetData","Offer")', function (data) {
+            // Проходим по всем данным и устанавливаем для них маркеры
+            $.each(data, function (i, item) {
+                var marker = new google.maps.Marker({
+                    'position': new google.maps.LatLng(item.latitude.substring(0, 9), item.longitude.substring(0, 9)),
+                    'map': map,
+                    'title': item.placeName
+                });
+
+                // Берем для этих маркеров синие иконки с сайта google
+                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png')
+
+                // Для каждого объекта добавляем доп. информацию, выводимую в отдельном окне
+                var infowindow = new google.maps.InfoWindow({
+                    content: "<div class='stationInfo'><h2>Водитель: " + item.name + "</h2><div><h4>Автомобиль: "
+                        + item.auto + "</h4></div><div><h4>Цена за км: " + item.price + " грн/км</h4>" + "<a href='/Offer/AgreeTaxiOffer/" + item.id + "'>Заказ</a>" +
+                        "</div></div>"
+                });
+                // обработчик нажатия на маркер объекта
+                google.maps.event.addListener(marker, 'click', function () {
+                    infowindow.open(map, marker);
+
+                });
+            })
+        });
+    }
+    </script>
+}

@@ -1,0 +1,54 @@
+﻿@using Identity.Models
+@model IEnumerable<Identity.Models.TaxiOffer>
+@{
+    ViewBag.Title = "Все такси";
+}
+<h2>Все доступные предложения</h2>
+<a asp-controller="Order" asp-action="Index" class="btn btn-default btn">Посмотреть на карте</a>
+<table class="table">
+    
+    <form asp-controller="Offer" asp-action="TaxiOffers">
+        <p>
+            Водитель: <input type="text" name="SearchString">
+            <input class="btn btn-default" type="submit" value="Поиск" />
+        </p>
+    </form>
+    <tr>
+        <th>
+               Водитель
+        </th>
+        <th>
+            <a asp-action="TaxiOffers" asp-route-sortOrder="@ViewBag.PriceSort">
+                Цена
+            </a>
+        </th>
+        <th>
+            Действие
+        </th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Name</td>
+            <td>@item.Price</td>
+            <td>
+                <div class="btn-group">
+
+                    <a class="btn btn-default" data-toggle="tooltip" title="Подробнее" data-placement="top" asp-action="DetailsTaxiOffer" asp-controller="Offer" asp-route-id="@item.Id"><span class="glyphicon glyphicon-info-sign"></span></a>
+                    @if (this.User.IsInRole("admin"))
+                    {
+                        <a class="btn btn-default" data-toggle="tooltip" title="Изменить" data-placement="top" asp-action="EditTaxiOffer" asp-controller="Offer" asp-route-id="@item.Id"><span class="glyphicon glyphicon-pencil"></span></a>
+                        <a class="btn btn-default" data-toggle="tooltip" title="Удалить" data-placement="top" asp-action="DeleteTaxiOffer" asp-controller="Offer" asp-route-id="@item.Id"><span class="glyphicon glyphicon-remove"></span> </a>
+                        <a class="btn btn-default" asp-action="AgreeTaxiOffer" data-toggle="tooltip" title="Принять" data-placement="top" asp-controller="Offer" asp-route-id="@item.Id"><span class="glyphicon glyphicon-ok"></span></a>
+                    }
+                    else if (this.User.IsInRole("user"))
+                    {
+                        <a class="btn btn-default" data-toggle="tooltip" title="Принять" data-placement="top" asp-action="AgreeTaxiOffer" asp-controller="Offer" asp-route-id="@item.Id"><span class="glyphicon glyphicon-ok"></span> </a>
+                    }
+                </div>
+            </td>
+        </tr>
+    }
+</table>
+<a asp-controller="Order" asp-action="CreateTaxiOrder" class="btn btn-default btn">Cоздать запрос</a>

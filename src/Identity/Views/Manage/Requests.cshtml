@@ -1,0 +1,17 @@
+﻿@using Identity.Models
+@model IEnumerable<Identity.Models.RequestRole>
+@{
+    ViewBag.Title = "Все заявки";
+}
+
+<table class="table">
+    @foreach (var request in Model)
+    {
+        <tr>
+            <td>@request.UserName - @request.NewRole</td>
+            <td>
+                <a asp-action="ConfirmTaxiDriverRole" asp-controller="Manage"  asp-route-id="@request.Id">Подтвердить изменение @request.Id</a>
+            </td>
+        </tr>
+    }
+</table>

@@ -1,0 +1,23 @@
+﻿@using Identity.Models
+@model Identity.Models.Order
+@{
+    ViewBag.Title = "Подтверждение выполнения заказа";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="ConfirmTaxiOrder" asp-controller="Order">
+    
+    <div class="form-group">
+        <label asp-for="Duration" class="control-label">Длительность</label>
+        <input type="time" asp-for="Duration" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Distanse" class="control-label">Расстояние</label>
+        <input type="number" asp-for="Distanse" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Подтвердить" class="btn btn-default" />
+    </div>
+</form>

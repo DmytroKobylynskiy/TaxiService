@@ -2,80 +2,50 @@
 @using Identity.Models.ManageViewModels
 @model Identity.Models.ManageViewModels.IndexViewModel
 @{
-    ViewData["Title"] = "Manage your account";
+    ViewData["Title"] = "Личный профиль";
 }
 
 <h2>@ViewData["Title"].</h2>
 <p class="text-success">@ViewData["StatusMessage"]</p>
 
 <div>
-    <h4>Change your account settings</h4>
     <hr />
     <dl class="dl-horizontal">
-        <dt>Password:</dt>
+        <dt>Пароль:</dt>
         <dd>
             @if (Model.HasPassword)
             {
-                <a asp-controller="Manage" asp-action="ChangePassword" class="btn-bracketed">Change</a>
+                <a asp-controller="Manage" asp-action="ChangePassword" class="btn btn-default">Изменить</a>
             }
             else
             {
-                <a asp-controller="Manage" asp-action="SetPassword" class="btn-bracketed">Create</a>
+                <a asp-controller="Manage" asp-action="SetPassword" class="btn btn-default">Create</a>
             }
         </dd>
-        <dt>External Logins:</dt>
-        <dd>
-            <a asp-controller="Manage" asp-action="ManageLogins" asp-route-userid="@Model" class="btn-bracketed">Manage</a>
-        </dd>
-        
         <dt>Изменить роль :</dt>
         <dd>
-            <a asp-controller="Manage" asp-action="ChangeRole" class="btn-bracketed">Изменить</a>
+            <a asp-controller="Manage" asp-action="ChangeRole" class="btn btn-default">Изменить</a>
         </dd>
-        
-        <dd>
-            <a asp-controller="Manage" asp-action="Requests" class="btn-bracketed">Заявки на изменение роли</a>
-        </dd>
-        <dt>Phone Number:</dt>
-        <dd>
-            <p>
-                Phone Numbers can used as a second factor of verification in two-factor authentication.
-                See <a href="http://go.microsoft.com/fwlink/?LinkID=532713">this article</a>
-                for details on setting up this ASP.NET application to support two-factor authentication using SMS.
-            </p>
-            @*@(Model.PhoneNumber ?? "None")
-                @if (Model.PhoneNumber != null)
-                {
-                    <br />
-                    <a asp-controller="Manage" asp-action="AddPhoneNumber" class="btn-bracketed">Change</a>
-                    <form asp-controller="Manage" asp-action="RemovePhoneNumber" method="post">
-                        [<button type="submit" class="btn-link">Remove</button>]
-                    </form>
-                }
-                else
-                {
-                    <a asp-controller="Manage" asp-action="AddPhoneNumber" class="btn-bracketed">Add</a>
-                }*@
-        </dd>
+        @if (this.User.IsInRole("admin"))
+        {
+            <dd>
+                <a asp-controller="Manage" asp-action="Requests" class="btn btn-default">Заявки на изменение роли</a>
+            </dd> 
+        }
+        @if (this.User.IsInRole("user"))
+        {
+            <dd>
+                <dt>Мои предложения :</dt><dd><a asp-controller="Order" asp-action="MyOrders" class="btn btn-default">Мои заказы</a></dd>
+            </dd>
+        }
+        @if (this.User.IsInRole("taxi driver"))
+        {
+            <dd>
+                <dt>Мои предложения :</dt><dd><a asp-controller="Offer" asp-action="MyOffers" class="btn btn-default">Получить</a></dd>
+                <dt>Клиентские заказы :</dt><dd><a asp-controller="Order" asp-action="MyRequests" class="btn btn-default">Получить</a></dd>
+            </dd>
+        }
 
-        <dt>Two-Factor Authentication:</dt>
-        <dd>
-            <p>
-                There are no two-factor authentication providers configured. See <a href="http://go.microsoft.com/fwlink/?LinkID=532713">this article</a>
-                for setting up this application to support two-factor authentication.
-            </p>
-            @*@if (Model.TwoFactor)
-                {
-                    <form asp-controller="Manage" asp-action="DisableTwoFactorAuthentication" method="post" class="form-horizontal">
-                        Enabled <button type="submit" class="btn-link btn-bracketed">Disable</button>
-                    </form>
-                }
-                else
-                {
-                    <form asp-controller="Manage" asp-action="EnableTwoFactorAuthentication" method="post" class="form-horizontal">
-                        <button type="submit" class="btn-link btn-bracketed">Enable</button> Disabled
-                    </form>
-                }*@
-        </dd>
+       
     </dl>
 </div>

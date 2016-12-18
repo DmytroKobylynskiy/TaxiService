@@ -1,0 +1,19 @@
+﻿@using Identity.Models
+@model IEnumerable<Identity.Models.Order>
+@{
+    ViewBag.Title = "Мои заказы";
+}
+<h2>@ViewData["Title"]</h2>
+<table class="table">
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.StartPoint - @item.EndPoint</td>
+            <td>
+                <a class="btn btn-default" data-toggle="tooltip" title="Подробнее" data-placement="top" asp-action="DetailsTaxiOrder" asp-controller="Order" asp-route-id="@item.Id"><span class="glyphicon glyphicon-info-sign"></span></a>
+                <a class="btn btn-default" data-toggle="tooltip" title="Изменить" data-placement="top" asp-action="EditTaxiOrder" asp-controller="Order" asp-route-id="@item.Id"><span class="glyphicon glyphicon-pencil"></span></a>
+                <a class="btn btn-default" data-toggle="tooltip" title="Удалить" data-placement="top" asp-action="DeleteTaxiOrder" asp-controller="Order" asp-route-id="@item.Id"><span class="glyphicon glyphicon-remove"></span> </a>
+            </td>
+        </tr>
+    }
+</table>

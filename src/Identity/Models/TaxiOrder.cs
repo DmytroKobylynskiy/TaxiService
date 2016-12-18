@@ -5,25 +5,25 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Identity.Models
 {
-    public class TaxiOrder : IEnumerable
+    public class TaxiOrder
     {
         public int Id { get; set; }
-        [Required]
-        [RegularExpression(@"/^[a-zA-Zа-яА-Я'][a-zA-Zа-яА-Я-' ]+[a-zA-Zа-яА-Я']?$/u", ErrorMessage = "Недопустимая начальная точка")]
+        [Required(ErrorMessage = "Недопустимая начальная точка")]
+        [RegularExpression(@"^[А-Я]+[а-яА-Я''-'\s]*$", ErrorMessage = "Недопустимая начальная точка")]
         public string StartPoint { get; set; }
-        [Required]
-        [RegularExpression(@"/^[a-zA-Zа-яА-Я'][a-zA-Zа-яА-Я-' ]+[a-zA-Zа-яА-Я']?$/u", ErrorMessage = "Недопустимая конечная точка")]
+        [Required(ErrorMessage = "Недопустимая конечная точка")]
+        [RegularExpression(@"^[А-Я]+[а-яА-Я''-'\s]*$", ErrorMessage = "Недопустимая конечная точка")]
         public string EndPoint { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Недопустимая дата")]
         [Range(typeof(DateTime), "11/12/2016", "1/1/2020")]
         public string Date { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Недопустимое время")]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:hh:mm tt}")]
         [DataType(DataType.Time)]
         public string Time { get; set; }
         public bool WithAnimals { get; set; }
         public bool FreightCar { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Расстояние от 1 до 10000")]
         [Range(1,10000,ErrorMessage = "Расстояние от 1 до 10000")]
         public float Distanse { get; set; }
         [Required]
@@ -33,16 +33,13 @@ namespace Identity.Models
         [Required]
         [Phone(ErrorMessage = "Недопустимый номер телефона")]
         public string PassengerPhone { get; set; }
-        [Required]
-        [DisplayName]
+        [Required(ErrorMessage = "Недопустимое имя")]
+        [RegularExpression(@"^[А-Я]+[а-яА-Я''-'\s]*$", ErrorMessage = "Не имя")]
         [StringLength(60, MinimumLength = 3)]
         public string PassengerName { get; set; }
         public string OrderOwnerId { get; set; }
         public string OrderStatus { get; set; }
         public string ReceiverId { get; set; }
-        public IEnumerator GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
+        public DateTime ExpectedTime { get; set; }
     }
 }

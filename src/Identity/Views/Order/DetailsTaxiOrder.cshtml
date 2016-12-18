@@ -1,0 +1,41 @@
+﻿@using Identity.Models
+@model Identity.Models.Order
+@{
+    ViewBag.Title = "Детали заказа";
+}
+<h2>@ViewData["Title"]</h2>
+<div>
+    <dl class="dl-horizontal">
+        <dt>Начальный пункт</dt>
+        <dd>@Model.StartPoint</dd>
+
+        <dt>Конечный пункт</dt>
+        <dd>@Model.EndPoint</dd>
+
+
+        <dt>Время</dt>
+        <dd>@Model.Time</dd>
+        
+        
+        <dt>Cтатус</dt>
+        <dd>@Model.OrderStatus</dd>
+
+        <dt>Имя</dt>
+        <dd>@Model.PassengerName</dd>
+        <dt>
+            Дополнительно
+            @if (@Model.WithAnimals)
+            {
+            <dd>С животными </dd>
+            }
+            @if (@Model.FreightCar)
+            {
+                <dd>Грузовая машина </dd>
+            }
+        </dt>
+        
+        
+        
+           
+</dl>
+</div>

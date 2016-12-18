@@ -1,0 +1,41 @@
+﻿@using Identity.Models
+@model Identity.Models.TaxiOffer
+@{
+    ViewBag.Title = Model.Name;
+}
+<h2>Водитель @Model.Name @ViewData["Avaliable"]</h2>
+<div>
+    <dl class="dl-horizontal">
+        @if (@ViewData["Avaliable"] == null)
+        {
+            <dt>Автомобиль</dt>
+            <dd>@Model.Auto</dd>
+            <dt>Местоположение</dt>
+            <dd>
+                @Html.DisplayFor(model => model.Latitude)
+                @Html.DisplayFor(model => model.Longitude)
+            </dd>
+            <dt>Цена</dt>
+            <dd>@Model.Price</dd>
+            <dt>Статус</dt>
+            <dd>@Model.OfferStatus</dd>
+            <a class="btn btn-default" asp-action="CreateTaxiOrderToConcreateDriver" asp-controller="Order" asp-route-receiverId="@Model.OfferOwnerId">Заказ такси </a>
+        }
+        else
+        {
+            <h2>ДОСТУПЕН ТОЛЬКО С @ViewData["Avaliable"]</h2>
+            <dt>Автомобиль</dt>
+            <dd>@Model.Auto</dd>
+            <dt>Местоположение</dt>
+            <dd>
+                @Html.DisplayFor(model => model.Latitude)
+                @Html.DisplayFor(model => model.Longitude)
+            </dd>
+            <dt>Цена</dt>
+            <dd>@Model.Price</dd>
+            <dt>Статус</dt>
+            <dd>@Model.OfferStatus</dd>
+            <a class="btn btn-default" asp-action="CreateTaxiOrderToConcreateDriver" asp-controller="Order" asp-route-receiverId="@Model.OfferOwnerId">Заказ такси </a>
+        }
+    </dl>
+</div>

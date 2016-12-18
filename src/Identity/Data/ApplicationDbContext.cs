@@ -12,7 +12,7 @@ namespace Identity.Data
         {
         }
         public DbSet<TaxiOffer> TaxiOffers { get; set; }
-        public DbSet<TaxiOrder> TaxiOrders { get; set; }
+        public DbSet<Order> Orders { get; set; }
         public DbSet<RequestRole> RequestsRole { get; set; }
         public ApplicationDbContext db { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)

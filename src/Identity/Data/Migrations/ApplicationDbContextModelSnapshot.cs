@@ -27,12 +27,16 @@ namespace Identity.Data.Migrations
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken();
 
-                    b.Property<string>("DriverLicense");
+                    b.Property<string>("DriverLicense")
+                        .IsRequired()
+                        .HasAnnotation("MaxLength", 10);
 
                     b.Property<string>("Email")
                         .HasAnnotation("MaxLength", 256);
 
                     b.Property<bool>("EmailConfirmed");
+
+                    b.Property<string>("IsAvaliable");
 
                     b.Property<bool>("LockoutEnabled");
 
@@ -69,6 +73,49 @@ namespace Identity.Data.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("Identity.Models.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Date")
+                        .IsRequired();
+
+                    b.Property<float>("Distanse");
+
+                    b.Property<string>("Duration");
+
+                    b.Property<string>("EndPoint")
+                        .IsRequired();
+
+                    b.Property<string>("ExpectedDate");
+
+                    b.Property<string>("ExpectedTime");
+
+                    b.Property<bool>("FreightCar");
+
+                    b.Property<string>("OrderOwnerId");
+
+                    b.Property<string>("OrderStatus");
+
+                    b.Property<string>("PassengerName")
+                        .IsRequired()
+                        .HasAnnotation("MaxLength", 60);
+
+                    b.Property<string>("ReceiverId");
+
+                    b.Property<string>("StartPoint")
+                        .IsRequired();
+
+                    b.Property<string>("Time");
+
+                    b.Property<bool>("WithAnimals");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Orders");
+                });
+
             modelBuilder.Entity("Identity.Models.RequestRole", b =>
                 {
                     b.Property<int>("Id")
@@ -92,57 +139,25 @@ namespace Identity.Data.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Auto");
+                    b.Property<string>("Auto")
+                        .IsRequired();
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Latitude");
+
+                    b.Property<string>("Longitude");
+
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.Property<string>("OfferOwnerId");
 
                     b.Property<string>("OfferStatus");
-
-                    b.Property<string>("Place");
 
                     b.Property<int>("Price");
 
                     b.HasKey("Id");
 
                     b.ToTable("TaxiOffers");
-                });
-
-            modelBuilder.Entity("Identity.Models.TaxiOrder", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Date");
-
-                    b.Property<float>("Distanse");
-
-                    b.Property<float>("Duration");
-
-                    b.Property<string>("EndPoint");
-
-                    b.Property<bool>("FreightCar");
-
-                    b.Property<string>("OrderOwnerId");
-
-                    b.Property<string>("OrderStatus");
-
-                    b.Property<string>("PassengerName");
-
-                    b.Property<string>("PassengerPhone");
-
-                    b.Property<string>("ReceiverId");
-
-                    b.Property<string>("StartPoint");
-
-                    b.Property<string>("Time");
-
-                    b.Property<bool>("WithAnimals");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TaxiOrders");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRole", b =>
