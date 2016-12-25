@@ -7,8 +7,10 @@
     
     @foreach (IdentityRole role in Model.AllRoles)
     {
-        <input type="radio" name="roles" value="@role.Name"
-               @(Model.UserRoles.Contains(role.Name) ? "checked=\"checked\"" : "") />@role.Name <br />
+        if (role == Model.AllRoles[0]) { }
+        else
+        {<input type="radio" name="roles" value="@role.Name"
+                @(Model.UserRoles.Contains(role.Name) ? "checked=\"checked\"" : "") />@role.Name <br /> }
     }
     <button type="submit" class="btn btn-primary">Сохранить</button>
 </form>

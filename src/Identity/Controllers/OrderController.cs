@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-// For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Identity.Controllers
 {
@@ -147,8 +146,6 @@ namespace Identity.Controllers
         {
             Order Order = new Order();
             Order.ReceiverId = receiverId;
-            var taxiDriver = await userManager.FindByIdAsync(receiverId);
-            ViewData["Avaliable"] = taxiDriver.IsAvaliable;
             _logger.LogInformation("ReceiverId"+receiverId);
             //db.Orders.Add(Order);
             //await db.SaveChangesAsync();

@@ -86,7 +86,8 @@ namespace Identity.Data.Migrations
                     b.Property<string>("Duration");
 
                     b.Property<string>("EndPoint")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasAnnotation("MaxLength", 30);
 
                     b.Property<string>("ExpectedDate");
 
@@ -105,7 +106,8 @@ namespace Identity.Data.Migrations
                     b.Property<string>("ReceiverId");
 
                     b.Property<string>("StartPoint")
-                        .IsRequired();
+                        .IsRequired()
+                        .HasAnnotation("MaxLength", 30);
 
                     b.Property<string>("Time");
 

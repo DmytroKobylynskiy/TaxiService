@@ -35,7 +35,7 @@
         @if (this.User.IsInRole("user"))
         {
             <dd>
-                <dt>Мои предложения :</dt><dd><a asp-controller="Order" asp-action="MyOrders" class="btn btn-default">Мои заказы</a></dd>
+                <dt>Мои заказы :</dt><dd><a asp-controller="Order" asp-action="MyOrders" class="btn btn-default">Мои заказы</a></dd>
             </dd>
         }
         @if (this.User.IsInRole("taxi driver"))

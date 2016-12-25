@@ -15,7 +15,7 @@
     </form>
     <tr>
         <th>
-               Водитель
+            Водитель
         </th>
         <th>
             <a asp-action="TaxiOffers" asp-route-sortOrder="@ViewBag.PriceSort">
@@ -51,4 +51,7 @@
         </tr>
     }
 </table>
-<a asp-controller="Order" asp-action="CreateTaxiOrder" class="btn btn-default btn">Cоздать запрос</a>
+@if (this.User.IsInRole("user"))
+{
+    <a asp-controller="Order" asp-action="CreateTaxiOrder" class="btn btn-default btn">Cоздать запрос</a>
+}

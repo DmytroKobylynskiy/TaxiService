@@ -112,8 +112,10 @@ namespace Identity.Controllers
             {
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email , CarExist=false , DriverLicense = "123"};
                 var allRoles = _roleManager.Roles.ToList();
-
+                List<string> addedRoles = new List<string>();
+                addedRoles.Add("user");
                 var result = await _userManager.CreateAsync(user, model.Password);
+                await _userManager.AddToRolesAsync(user, addedRoles);
                 if (result.Succeeded)
                 {
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
